@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Results Checker</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <header>
+    <h1>School Results Portal</h1>
+    <nav>
+      <a href="#checker">Check Results</a>
+      <a href="#admin">Admin Login</a>
+      <a href="#teacher">Teacher Panel</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="checker">
+      <h2>Check Your Result</h2>
+      <input type="text" id="studentId" placeholder="Enter Student ID" />
+      <select id="term">
+        <option value="term1">Term 1</option>
+        <option value="term2">Term 2</option>
+        <option value="term3">Term 3</option>
+      </select>
+      <button onclick="checkResult()">Check Result</button>
+      <div id="result"></div>
+    </section>
+
+    <section id="admin">
+      <h2>Admin Panel</h2>
+      <input type="password" id="adminPass" placeholder="Enter Admin Password" />
+      <button onclick="adminLogin()">Login</button>
+      <div id="adminPanel" style="display:none">
+        <h3>View All Results</h3>
+        <label for="adminTerm">Select Term:</label>
+        <select id="adminTerm" onchange="fetchAllResults()">
+          <option value="term1">Term 1</option>
+          <option value="term2">Term 2</option>
+          <option value="term3">Term 3</option>
+        </select>
+        <ul id="allResults"></ul>
+      </div>
+    </section>
+
+    <section id="teacher">
+      <h2>Teacher Upload Panel</h2>
+      <input type="text" id="tStudentId" placeholder="Student ID" />
+      <input type="text" id="tSubject" placeholder="Subject" />
+      <input type="text" id="tScore" placeholder="Score" />
+      <select id="tTerm">
+        <option value="term1">Term 1</option>
+        <option value="term2">Term 2</option>
+        <option value="term3">Term 3</option>
+      </select>
+      <button onclick="uploadResult()">Upload</button>
+      <div id="uploadMsg"></div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://your-project.supabase.co';
+    const SUPABASE_KEY = 'your-anon-key';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function checkResult() {
+      const studentId = document.getElementById('studentId').value.trim();
+      const term = document.getElementById('term').value;
+      const resultDiv = document.getElementById('result');
+
+      if (!studentId) {
+        resultDiv.innerHTML = '<p>Please enter a valid student ID.</p>';
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('results')
+        .select('*')
+        .eq('student_id', studentId)
+        .eq('term', term);
+
+      if (error || data.length === 0) {
+        resultDiv.innerHTML = '<p>No results found.</p>';
+      } else {
+        let output = `<h3>Results for ${studentId} (${term}):</h3><ul>`;
+        data.forEach(r => {
+          output += `<li>${r.subject}: ${r.score}</li>`;
+        });
+        output += '</ul>';
+        resultDiv.innerHTML = output;
+      }
+    }
+
+    async function adminLogin() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === 'admin123') {
+        document.getElementById('adminPanel').style.display = 'block';
+        fetchAllResults();
+      } else {
+        alert('Incorrect password');
+      }
+    }
+
+    async function fetchAllResults() {
+      const term = document.getElementById('adminTerm').value;
+      const { data, error } = await supabase
+        .from('results')
+        .select('*')
+        .eq('term', term);
+
+      const allResults = document.getElementById('allResults');
+      if (error || !data.length) {
+        allResults.innerHTML = '<li>No results available.</li>';
+        return;
+      }
+
+      const sorted = data.sort((a, b) => a.student_id.localeCompare(b.student_id));
+      allResults.innerHTML = sorted.map(r => `<li><strong>${r.student_id}</strong> - ${r.subject}: ${r.score}</li>`).join('');
+    }
+
+    async function uploadResult() {
+      const studentId = document.getElementById('tStudentId').value.trim();
+      const subject = document.getElementById('tSubject').value.trim();
+      const score = document.getElementById('tScore').value.trim();
+      const term = document.getElementById('tTerm').value;
+      const msgDiv = document.getElementById('uploadMsg');
+
+      if (!studentId || !subject || !score) {
+        msgDiv.textContent = 'Please fill all fields.';
+        return;
+      }
+
+      const { error } = await supabase
+        .from('results')
+        .insert([{ student_id: studentId, subject: subject, score: score, term: term }]);
+
+      if (error) {
+        msgDiv.textContent = 'Upload failed.';
+      } else {
+        msgDiv.textContent = 'Result uploaded successfully!';
+        document.getElementById('tStudentId').value = '';
+        document.getElementById('tSubject').value = '';
+        document.getElementById('tScore').value = '';
+      }
+    }
+  </script>
+</body>
+</html>

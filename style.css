@@ -1,0 +1,93 @@
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f4f8;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+header {
+  background-color: #004080;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+nav {
+  margin-top: 0.5rem;
+}
+
+nav a {
+  color: white;
+  margin: 0 1rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+section h2 {
+  border-bottom: 2px solid #004080;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+input[type='text'],
+input[type='password'],
+select {
+  padding: 0.5rem;
+  width: calc(100% - 1rem);
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background-color: #004080;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0059b3;
+}
+
+#result,
+#uploadMsg {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+#adminPanel ul {
+  list-style: none;
+  padding: 0;
+}
+
+#adminPanel li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ccc;
+}
